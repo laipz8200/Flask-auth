@@ -49,7 +49,7 @@ def logout():
     }))
     # clear token
     response.set_cookie('jwt', '', httponly=True, max_age=1, samesite='Lax')
-    return response
+    return response, 200
 
 
 @bp.route('/user/me', methods=['GET'])
@@ -73,8 +73,10 @@ def get_myself():
         'uuid': user.public_id,
         'username': user.username,
         'email': user.email,
+        'nickname': user.nickname,
         'created_on': user.created_on,
-    })
+        'permissions': [permission.text for permission in user.permissions]
+    }), 200
 
 
 @bp.route('/user', methods=['POST'])
@@ -116,3 +118,64 @@ def create_user():
     db.session.commit()
 
     return jsonify({'message': 'Created a new user.'}), 201
+
+
+@bp.route('/user/<uuid>', methods=['GET'])
+def view_user(uuid):
+    """View user information
+
+    :uuid: User's public id
+    :returns: TODO
+
+    """
+    # find user with uuid
+    user = User.query.filter_by(public_id=uuid).first()
+    if not user:
+        return jsonify({'message': 'User does not exist.'}), 404
+    # return user information
+    return jsonify({
+        'uuid': user.public_id,
+        'username': user.username,
+        'email': user.email,
+        'nickname': user.nickname,
+        'created_on': user.created_on,
+    }), 200
+
+
+@bp.route('/user/<uuid>', methods=['PUT'])
+def update_user(uuid):
+    """Update user information
+
+    :uuid: User's public id
+    :returns: TODO
+
+    """
+    # get jwt
+    token = request.cookies.get('jwt')
+    if not token:
+        return jsonify({'message': 'Missing verification letter.'}), 401
+    # verify jwt
+    data = User.verify_jwt(token)
+    if not data:
+        return jsonify({'message': 'Token expired.'}), 401
+    # check uuid
+    if uuid != data['uuid']:
+        return jsonify({'message': 'Can only modify your own information.'}), 401
+    # get user
+    user = User.query.get(data['user_id'])
+    # get form data
+    data = request.form
+    # check form data
+    error = []
+    if not 'nickname' in data:
+        error.append('nickname')
+    if len(error) > 0:
+        return jsonify({
+            'message': 'Require {}.'.format(' and '.join(error))
+        }), 400
+    # update user information
+    user.nickname = data['nickname']
+    # db commit
+    db.session.commit()
+
+    return jsonify({'message': 'Data update completed.'}), 200

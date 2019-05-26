@@ -20,6 +20,7 @@ class User(db.Model):
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(120), unique=True, index=True)
     password_hash = db.Column(db.String(128))
+    nickname = db.Column(db.String(20))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     permissions = db.relationship(
         'Permission', secondary=user_permissions, back_populates='users'
@@ -48,7 +49,8 @@ class User(db.Model):
                 'exp': time() + expries_in
             },
             current_app.config['SECRET_KEY'],
-            algorithm='HS256').decode('utf-8')
+            algorithm='HS256'
+        ).decode('utf-8')
 
     @staticmethod
     def verify_jwt(token):
@@ -62,7 +64,8 @@ class User(db.Model):
             data = jwt.decode(
                 token,
                 current_app.config['SECRET_KEY'],
-                algorithms=['HS256'])
+                algorithms=['HS256']
+            )
         except Exception:
             return None
         return data
@@ -72,7 +75,7 @@ class Permission(db.Model):
     """User Permission"""
     __tablename__ = 'permissions'
     id = db.Column(db.Integer, primary_key=True)
-    permission = db.Column(db.String(50), unique=True)
+    text = db.Column(db.String(50), unique=True)
     users = db.relationship(
         'User', secondary=user_permissions, back_populates='permissions'
     )
