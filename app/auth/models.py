@@ -1,7 +1,7 @@
 from datetime import datetime
 from time import time
 from flask import current_app
-from app.database import db
+from app.database import Model, Column, relationship, db
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
@@ -12,17 +12,17 @@ user_permissions = db.Table(
 )
 
 
-class User(db.Model):
+class User(Model):
     """User Model"""
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(50), unique=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    email = db.Column(db.String(120), unique=True, index=True)
-    password_hash = db.Column(db.String(128))
-    nickname = db.Column(db.String(20), default='no name')
-    created_on = db.Column(db.DateTime, default=datetime.utcnow)
-    permissions = db.relationship(
+    id = Column(db.Integer, primary_key=True)
+    public_id = Column(db.String(50), unique=True)
+    username = Column(db.String(64), unique=True, index=True)
+    email = Column(db.String(120), unique=True, index=True)
+    password_hash = Column(db.String(128))
+    nickname = Column(db.String(20), default='no name')
+    created_on = Column(db.DateTime, default=datetime.utcnow)
+    permissions = relationship(
         'Permission', secondary=user_permissions, back_populates='users'
     )
 
@@ -71,12 +71,12 @@ class User(db.Model):
         return data
 
 
-class Permission(db.Model):
+class Permission(Model):
     """User Permission"""
     __tablename__ = 'permissions'
-    id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String(50), unique=True)
-    users = db.relationship(
+    id = Column(db.Integer, primary_key=True)
+    text = Column(db.String(50), unique=True)
+    users = relationship(
         'User', secondary=user_permissions, back_populates='permissions'
     )
 
