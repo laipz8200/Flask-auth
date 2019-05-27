@@ -178,8 +178,6 @@ def update_user(uuid):
             'message': 'Require {}.'.format(' and '.join(error))
         }), 400
     # update user information
-    user.nickname = data['nickname']
-    # db commit
-    db.session.commit()
+    user.update(nickname=data['nickname'].strip())
 
     return jsonify({'message': 'Data update completed.'}), 200

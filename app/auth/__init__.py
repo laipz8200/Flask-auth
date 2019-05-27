@@ -1,2 +1,2 @@
 """The auth module"""
-from . import views
+from app.auth import views
