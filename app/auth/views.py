@@ -1,8 +1,10 @@
 import uuid
-from flask import request, jsonify, make_response
-from app import db
-from app.auth import bp
+from flask import Blueprint, request, jsonify, make_response
+from app.database import db
 from app.auth.models import User
+
+
+bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
 @bp.route('/login', methods=['POST'])
@@ -160,14 +162,16 @@ def update_user(uuid):
         return jsonify({'message': 'Token expired.'}), 401
     # check uuid
     if uuid != data['uuid']:
-        return jsonify({'message': 'Can only modify your own information.'}), 401
+        return jsonify({
+            'message': 'Can only modify your own information.'
+        }), 401
     # get user
     user = User.query.get(data['user_id'])
     # get form data
     data = request.form
     # check form data
     error = []
-    if not 'nickname' in data:
+    if 'nickname' not in data:
         error.append('nickname')
     if len(error) > 0:
         return jsonify({

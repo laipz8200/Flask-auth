@@ -1,4 +1,5 @@
-from app import create_app, db
+from app.app import create_app
+from app.extensions import db
 from app.auth.models import User, Permission
 
 app = create_app()
