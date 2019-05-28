@@ -76,8 +76,9 @@ def get_myself():
         'username': user.username,
         'email': user.email,
         'nickname': user.nickname,
+        'groups': data['groups'],
+        'permissions': data['permissions'],
         'created_on': user.created_on,
-        'permissions': [permission.text for permission in user.permissions]
     }), 200
 
 
