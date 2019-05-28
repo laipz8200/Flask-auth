@@ -32,6 +32,12 @@
 
 ## 初始化
 
+### 安装依赖
+
+```
+pip install -r requirement.txt
+```
+
 ### 数据库模型和迁移文件初始化
 
 ```
@@ -49,3 +55,10 @@ FLASK_APP=autoapp.py
 DATABASE_URL=<your-database-url>
 SECRET_KEY=<your-secret-key>
 ```
+
+### 运行服务
+
+```
+flask run
+```
+
