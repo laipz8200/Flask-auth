@@ -28,4 +28,24 @@
 2019-05-28
 
 - 添加了基于RBAC模式的权限管理
+- 从github上移除了migrations目录
 
+## 初始化
+
+### 数据库模型和迁移文件初始化
+
+```
+flask db init
+flask db migrate
+flask db upgrade
+```
+
+### 配置初始化
+
+在根目录下创建`.env`文件并在其中设置基本信息:
+
+```
+FLASK_APP=autoapp.py
+DATABASE_URL=<your-database-url>
+SECRET_KEY=<your-secret-key>
+```
