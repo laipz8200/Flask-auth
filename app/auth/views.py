@@ -117,8 +117,7 @@ def create_user():
     # password hash
     user.set_password(data['password'].strip())
     # db commit
-    db.session.add(user)
-    db.session.commit()
+    user.save()
 
     return jsonify({'message': 'Created a new user.'}), 201
 
