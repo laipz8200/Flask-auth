@@ -25,6 +25,15 @@
 
 ## 更新
 
+2019-05-30
+
+- 添加了`SurrogateBaseKey`Mixin自动为模型添加主键`id`和删除标志`is_deleted`
+- 修改数据库方法`delete()`为**将`is_deleted`修改为`True`**
+- 添加新方法`remove()`实现原来`delete()`方法的功能
+- 新增了两个类方法`filter_by`和`filter`, 用法与SQLAlchemy原方法类似, 但不会包含被标记为`is_deleted`的结果
+- 添加删除用户接口
+- 编写了权限验证装饰器
+
 2019-05-28
 
 - 添加了基于RBAC模式的权限管理

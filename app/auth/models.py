@@ -1,7 +1,7 @@
 from datetime import datetime
 from time import time
 from flask import current_app
-from app.database import Model, Column, relationship, db
+from app.database import Model, SurrogateBaseKey, Column, relationship, db
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 
@@ -13,10 +13,9 @@ groups_users = db.Table(
 )
 
 
-class User(Model):
+class User(SurrogateBaseKey, Model):
     """User Model"""
     __tablename__ = 'users'
-    id = Column(db.Integer, primary_key=True)
     public_id = Column(db.String(50), unique=True, nullable=False)
     username = Column(db.String(64), unique=True, index=True, nullable=False)
     email = Column(db.String(120), unique=True, index=True, nullable=False)
@@ -45,7 +44,9 @@ class User(Model):
                 'user_id': self.id,
                 'uuid': self.public_id,
                 'groups': [group.name for group in self.groups],
-                'permissions': [permission.text for group in self.groups for permission in group.permissions],
+                'permissions': [permission.text
+                                for group in self.groups
+                                for permission in group.permissions],
                 'exp': time() + expries_in
             },
             current_app.config['SECRET_KEY'],
@@ -78,10 +79,9 @@ groups_permissions = db.Table(
 )
 
 
-class Group(Model):
+class Group(SurrogateBaseKey, Model):
     """User Group"""
     __tablename__ = 'groups'
-    id = Column(db.Integer, primary_key=True)
     name = Column(db.String(20), unique=True, nullable=False)
     users = relationship(
         'User', secondary=groups_users, lazy='subquery',
@@ -94,10 +94,9 @@ class Group(Model):
         return '<Group %r>' % self.name
 
 
-class Permission(Model):
+class Permission(SurrogateBaseKey, Model):
     """User Permission"""
     __tablename__ = 'permissions'
-    id = Column(db.Integer, primary_key=True)
     text = Column(db.String(50), unique=True, nullable=False)
 
     def __repr__(self):
