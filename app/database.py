@@ -8,6 +8,11 @@ relationship = db.relationship
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD operations."""
     @classmethod
+    def all(cls):
+        """Get all record from the database except is_deleted."""
+        return cls.query.filter_by(is_deleted=False).all()
+
+    @classmethod
     def filter_by(cls, **kwargs):
         """
         apply the given filtering criterion to a copy of this Query,

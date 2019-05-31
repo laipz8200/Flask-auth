@@ -1,5 +1,6 @@
 import uuid
-from flask import Blueprint, request, jsonify, make_response
+from functools import wraps
+from flask import Blueprint, request, jsonify, make_response, url_for
 from app.auth.models import User
 
 
@@ -9,6 +10,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 def check_permission(permission):
     """Decorator for checking permissions."""
     def decorator(view_func):
+        @wraps(view_func)
         def wrapper(*args, **kwargs):
             # get jwt
             token = request.cookies.get('jwt')
@@ -35,7 +37,7 @@ def login():
 
     """
     # get form info
-    data = request.form
+    data = request.json or {}
     # check info
     error = []
     if 'username' not in data:
@@ -75,44 +77,32 @@ def logout():
     return response, 200
 
 
-@bp.route('/user/me', methods=['GET'])
-def get_myself():
-    """Get your own information
-    :returns: TODO
-
-    """
-    # get token
-    token = request.cookies.get('jwt')
-    if not token:
-        return jsonify({'message': 'Missing verification letter.'}), 401
-    # verify token
-    data = User.verify_jwt(token)
-    if not data:
-        return jsonify({'message': 'Token expired.'}), 401
-    # find user
-    user = User.get_by_id(data['user_id'])
-    if user is None:
-        return jsonify({'message': 'User does not exist.'}), 404
-
-    return jsonify({
-        'uuid': user.public_id,
-        'username': user.username,
-        'email': user.email,
-        'nickname': user.nickname,
-        'groups': data['groups'],
-        'permissions': data['permissions'],
-        'created_on': user.created_on,
-    }), 200
+@bp.route('/users', methods=['GET'])
+@check_permission(permission='Can view users')
+def view_users():
+    """View user list."""
+    # get user list
+    users = User.all()
+    # format user data
+    data = []
+    for user in users:
+        data.append({
+            'url': url_for('auth.view_user', uuid=user.public_id, _external=True),
+            'username': user.username,
+            'email': user.email
+        })
+    # return
+    return jsonify({'data': data}), 200
 
 
-@bp.route('/user', methods=['POST'])
+@bp.route('/users', methods=['POST'])
 def create_user():
     """Create a new user
     :returns: TODO
 
     """
     # get form info
-    data = request.form
+    data = request.json or {}
     # check info
     error = []
     if 'username' not in data:
@@ -145,7 +135,37 @@ def create_user():
     return jsonify({'message': 'Created a new user.'}), 201
 
 
-@bp.route('/user/<uuid>', methods=['GET'])
+@bp.route('/users/me', methods=['GET'])
+def get_myself():
+    """Get your own information
+    :returns: TODO
+
+    """
+    # get token
+    token = request.cookies.get('jwt')
+    if not token:
+        return jsonify({'message': 'Missing verification letter.'}), 401
+    # verify token
+    data = User.verify_jwt(token)
+    if not data:
+        return jsonify({'message': 'Token expired.'}), 401
+    # find user
+    user = User.get_by_id(data['user_id'])
+    if user is None:
+        return jsonify({'message': 'User does not exist.'}), 404
+
+    return jsonify({
+        'uuid': user.public_id,
+        'username': user.username,
+        'email': user.email,
+        'nickname': user.nickname,
+        'groups': data['groups'],
+        'permissions': data['permissions'],
+        'created_on': user.created_on,
+    }), 200
+
+
+@bp.route('/users/<uuid>', methods=['GET'])
 def view_user(uuid):
     """View user information
 
@@ -167,7 +187,7 @@ def view_user(uuid):
     }), 200
 
 
-@bp.route('/user/<uuid>', methods=['PUT'])
+@bp.route('/users/<uuid>', methods=['PUT'])
 def update_user(uuid):
     """Update user information
 
@@ -193,7 +213,7 @@ def update_user(uuid):
     if user is None:
         return jsonify({'message': 'User does not exist.'}), 404
     # get form data
-    data = request.form
+    data = request.json or {}
     # check form data
     error = []
     if 'nickname' not in data:
@@ -208,7 +228,7 @@ def update_user(uuid):
     return jsonify({'message': 'Data update completed.'}), 200
 
 
-@bp.route('/user/<uuid>', methods=['DELETE'])
+@bp.route('/users/<uuid>', methods=['DELETE'])
 @check_permission(permission='Can delete user')
 def delete_user(uuid):
     """Delete user
