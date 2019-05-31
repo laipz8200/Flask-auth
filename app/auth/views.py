@@ -96,8 +96,10 @@ def view_users():
             'url': url_for(
                 'auth.view_user', uuid=user.public_id, _external=True
             ),
+            'uuid': user.public_id,
             'username': user.username,
-            'email': user.email
+            'email': user.email,
+            'created_on': user.created_on
         })
     # return
     return jsonify({
@@ -262,5 +264,7 @@ def delete_user(uuid):
     if not user:
         return jsonify({'message': 'User does not exist.'}), 404
     # delete user
+    if 'administrator' in [group.name for group in user.groups]:
+        return jsonify({'message': 'You cannot delete an admin user.'}), 403
     user.delete()
     return jsonify({'message': 'User has been deleted.'}), 200

@@ -7,6 +7,11 @@ relationship = db.relationship
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD operations."""
     @classmethod
+    def order_by(cls, *args, **kwargs):
+        """Sort records except is_deleted."""
+        return cls.query.order_by(*args, **kwargs).filter_by(is_deleted=False)
+
+    @classmethod
     def paginate(cls, *args, **kwargs):
         """Returns ``per_page`` items from page ``page``.
 
