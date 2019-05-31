@@ -25,6 +25,11 @@
 
 ## 更新
 
+2019-05-31
+
+- 添加了`view_users`方法, 修复了权限检查装饰器会替换原函数的bug
+- 登录和注册以外的用户相关URL统一改为'users'
+
 2019-05-30
 
 - 添加了`SurrogateBaseKey`Mixin自动为模型添加主键`id`和删除标志`is_deleted`
@@ -70,4 +75,28 @@ SECRET_KEY=<your-secret-key>
 ```
 flask run
 ```
+
+## 设计
+
+### 路由设计
+
+```
+Endpoint          Methods  Rule
+----------------  -------  -----------------------
+auth.create_user  POST     /auth/users
+auth.delete_user  DELETE   /auth/users/<uuid>
+auth.get_myself   GET      /auth/users/me
+auth.login        POST     /auth/login
+auth.logout       POST     /auth/logout
+auth.update_user  PUT      /auth/users/<uuid>
+auth.view_user    GET      /auth/users/<uuid>
+auth.view_users   GET      /auth/users
+```
+
+### 权限设计
+
+| 权限         | 名称             | 注释                                                       |
+| ---          | ---              | ---                                                        |
+| 删除用户     | Can delete users |                                                            |
+| 查看用户列表 | Can view users   | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
 

@@ -229,7 +229,7 @@ def update_user(uuid):
 
 
 @bp.route('/users/<uuid>', methods=['DELETE'])
-@check_permission(permission='Can delete user')
+@check_permission(permission='Can delete users')
 def delete_user(uuid):
     """Delete user
 
