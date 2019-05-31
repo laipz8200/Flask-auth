@@ -29,6 +29,8 @@
 
 - 添加了`view_users`方法, 修复了权限检查装饰器会替换原函数的bug
 - 登录和注册以外的用户相关URL统一改为'users'
+- 为database封装了`paginate`和`count`方法
+- 为`view_users`方法添加了分页并优化了返回结果
 
 2019-05-30
 
