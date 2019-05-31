@@ -78,6 +78,139 @@ SECRET_KEY=<your-secret-key>
 flask run
 ```
 
+## 演示
+
+### 登录
+
+```
+$ http --session=flask-auth POST :5000/auth/login username=admin password=admin
+HTTP/1.0 200 OK
+Content-Length: 37
+Content-Type: application/json
+Date: Fri, 31 May 2019 15:59:25 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+Set-Cookie: jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJ1dWlkIjoiZjM5Y2VmMzYtODJiZC0xMWU5LWE0ZGMtOTg1YWViZTFjNmFlIiwicGVybWlzc2lvbnMiOlsiQ2FuIGRlbGV0ZSB1c2VycyIsIkNhbiB2aWV3IHVzZXJzIl0sImV4cCI6MTU1OTQwNDc2NS44MzQ4NzU4fQ.eF1qnfWWqIo090F04-oJZbNGPlM8XvtndNdq6m1i3v8; Expires=Sat, 01-Jun-2019 15:59:25 GMT; Max-Age=86400; HttpOnly; Path=/; SameSite=Lax
+
+{
+    "message": "login successful."
+}
+```
+
+#### 认证失败
+
+```
+$ http --session=flask-auth POST :5000/auth/login username=admin password=wrong_psw
+HTTP/1.0 401 UNAUTHORIZED
+Content-Length: 47
+Content-Type: application/json
+Date: Fri, 31 May 2019 16:01:12 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "message": "Wrong username or password."
+}
+```
+
+#### 缺少信息
+
+```
+$ http --session=flask-auth POST :5000/auth/login
+HTTP/1.0 400 BAD REQUEST
+Content-Length: 50
+Content-Type: application/json
+Date: Fri, 31 May 2019 16:00:41 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "message": "Require username and password."
+}
+```
+
+### 获取个人信息
+
+```
+$ http --session=flask-auth :5000/auth/users/me
+HTTP/1.0 200 OK
+Content-Length: 308
+Content-Type: application/json
+Date: Fri, 31 May 2019 16:04:40 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "created_on": "Thu, 30 May 2019 09:33:55 GMT",
+    "email": "admin@example.com",
+    "groups": [
+        "administrator"
+    ],
+    "nickname": "nickname",
+    "permissions": [
+        "Can delete users",
+        "Can view users"
+    ],
+    "username": "admin",
+    "uuid": "f39cef36-82bd-11e9-a4dc-985aebe1c6ae"
+}
+```
+
+### 查看用户列表
+
+```
+$ http --session=flask-auth :5000/auth/users
+HTTP/1.0 200 OK
+Content-Length: 397
+Content-Type: application/json
+Date: Fri, 31 May 2019 15:56:25 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "count": 2,
+    "next": null,
+    "prev": null,
+    "result": [
+        {
+            "email": "admin@example.com",
+            "url": "http://localhost:5000/auth/users/f39cef36-82bd-11e9-a4dc-985aebe1c6ae",
+            "username": "admin"
+        },
+        {
+            "email": "user2@example.com",
+            "url": "http://localhost:5000/auth/users/a9e265fa-82be-11e9-82d8-985aebe1c6ae",
+            "username": "user2"
+        }
+    ]
+}
+```
+
+#### 没有认证
+
+```
+$ http :5000/auth/users
+HTTP/1.0 401 UNAUTHORIZED
+Content-Length: 48
+Content-Type: application/json
+Date: Fri, 31 May 2019 16:02:21 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "message": "Missing verification letter."
+}
+```
+
+#### 权限不足
+
+```
+$ http --session=flask-auth :5000/auth/users
+HTTP/1.0 403 FORBIDDEN
+Content-Length: 38
+Content-Type: application/json
+Date: Fri, 31 May 2019 16:03:23 GMT
+Server: Werkzeug/0.15.4 Python/3.7.3
+
+{
+    "message": "Permission denied."
+}
+```
+
 ## 设计
 
 ### 路由设计
