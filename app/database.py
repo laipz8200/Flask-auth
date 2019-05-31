@@ -1,5 +1,4 @@
 from app.extensions import db
-from sqlalchemy import and_
 
 Column = db.Column
 relationship = db.relationship
@@ -8,28 +7,58 @@ relationship = db.relationship
 class CRUDMixin(object):
     """Mixin that adds convenience methods for CRUD operations."""
     @classmethod
+    def paginate(cls, *args, **kwargs):
+        """Returns ``per_page`` items from page ``page``.
+
+        If ``page`` or ``per_page`` are ``None``, they will be retrieved from
+        the request query. If ``max_per_page`` is specified, ``per_page`` will
+        be limited to that value. If there is no request or they aren't in the
+        query, they default to 1 and 20 respectively. If ``count`` is ``False``,
+        no query to help determine total page count will be run.
+
+        When ``error_out`` is ``True`` (default), the following rules will
+        cause a 404 response:
+
+        * No items are found and ``page`` is not 1.
+        * ``page`` is less than 1, or ``per_page`` is negative.
+        * ``page`` or ``per_page`` are not ints.
+
+        When ``error_out`` is ``False``, ``page`` and ``per_page`` default to
+        1 and 20 respectively.
+
+        Returns a :class:`Pagination` object.
+        """
+        return cls.query.filter_by(
+            is_deleted=False
+        ).paginate(*args, **kwargs)
+
+    @classmethod
     def all(cls):
         """Get all record from the database except is_deleted."""
         return cls.query.filter_by(is_deleted=False).all()
 
     @classmethod
-    def filter_by(cls, **kwargs):
-        """
-        apply the given filtering criterion to a copy of this Query,
-        using SQL expressions.
-        Exclude invalid records.(is_deleted)
-        """
-        return cls.query.filter_by(is_deleted=False, **kwargs)
+    def count(cls):
+        """Count the number of records except is_deleted."""
+        return cls.query.filter_by(is_deleted=False).count()
 
     @classmethod
-    def filter(cls, *criterion):
+    def filter_by(cls, *args, **kwargs):
         """
         apply the given filtering criterion to a copy of this Query,
         using SQL expressions.
         Exclude invalid records.(is_deleted)
         """
-        conditions = (and_(cls.is_deleted == 0, *criterion), )
-        return cls.query.filter(*conditions)
+        return cls.query.filter_by(*args, **kwargs).filter_by(is_deleted=False)
+
+    @classmethod
+    def filter(cls, *args, **kwargs):
+        """
+        apply the given filtering criterion to a copy of this Query,
+        using SQL expressions.
+        Exclude invalid records.(is_deleted)
+        """
+        return cls.query.filter(*args, **kwargs).filter_by(is_deleted=False)
 
     @classmethod
     def create(cls, **kwargs):

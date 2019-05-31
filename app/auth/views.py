@@ -80,19 +80,36 @@ def logout():
 @bp.route('/users', methods=['GET'])
 @check_permission(permission='Can view users')
 def view_users():
-    """View user list."""
+    """View user list.
+
+    This method has two hidden parameters:
+
+    * ``page`` is current page number, default to 1.
+    * ``per_page`` is number of users per page, default to 20.
+    """
     # get user list
-    users = User.all()
+    page = User.paginate(max_per_page=50)
     # format user data
     data = []
-    for user in users:
+    for user in page.items:
         data.append({
-            'url': url_for('auth.view_user', uuid=user.public_id, _external=True),
+            'url': url_for(
+                'auth.view_user', uuid=user.public_id, _external=True
+            ),
             'username': user.username,
             'email': user.email
         })
     # return
-    return jsonify({'data': data}), 200
+    return jsonify({
+        'count': User.count(),
+        'prev': url_for(
+            'auth.view_users', page=page.prev_num, _external=True
+        ) if page.has_prev else None,
+        'next': url_for(
+            'auth.view_users', page=page.next_num, _external=True
+        ) if page.has_next else None,
+        'result': data
+    }), 200
 
 
 @bp.route('/users', methods=['POST'])
@@ -159,8 +176,10 @@ def get_myself():
         'username': user.username,
         'email': user.email,
         'nickname': user.nickname,
-        'groups': data['groups'],
-        'permissions': data['permissions'],
+        'groups': [group.name for group in user.groups],
+        'permissions': [permission.text
+                        for group in user.groups
+                        for permission in group.permissions],
         'created_on': user.created_on,
     }), 200
 
@@ -183,6 +202,7 @@ def view_user(uuid):
         'username': user.username,
         'email': user.email,
         'nickname': user.nickname,
+        'groups': [group.name for group in user.groups],
         'created_on': user.created_on,
     }), 200
 

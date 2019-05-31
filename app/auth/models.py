@@ -43,7 +43,6 @@ class User(SurrogateBaseKey, Model):
             {
                 'user_id': self.id,
                 'uuid': self.public_id,
-                'groups': [group.name for group in self.groups],
                 'permissions': [permission.text
                                 for group in self.groups
                                 for permission in group.permissions],
