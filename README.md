@@ -238,8 +238,8 @@ auth.view_users   GET      /auth/users
 
 ### 权限设计
 
-| 权限         | 名称             | 注释                                                       |
-| ---          | ---              | ---                                                        |
-| 删除用户     | Can delete users |                                                            |
-| 查看用户列表 | Can view users   | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
+| 权限         | 名称             | 用户组        | 注释                                                       |
+| ---          | ---              | ---           | ---                                                        |
+| 删除用户     | Can delete users | Administrator |                                                            |
+| 查看用户列表 | Can view users   | Administrator | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
 
