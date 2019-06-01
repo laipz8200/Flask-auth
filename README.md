@@ -29,6 +29,9 @@
 
 - 为database封装了`order_by`方法
 - 禁止删除处于`administrator`组中的用户
+- 检查权限的装饰器改名为`require_permission`
+- 添加检查登录状态的装饰器`require_login`, 使用时被装饰方法需要在第一个参数接收`current_user`对象
+- 简化之前的方法
 
 2019-05-31
 
