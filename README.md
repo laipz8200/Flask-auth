@@ -229,6 +229,7 @@ Endpoint          Methods  Rule
 auth.create_user  POST     /auth/users
 auth.delete_user  DELETE   /auth/users/<uuid>
 auth.get_myself   GET      /auth/users/me
+auth.index        GET      /auth/
 auth.login        POST     /auth/login
 auth.logout       POST     /auth/logout
 auth.update_user  PUT      /auth/users/<uuid>
@@ -238,8 +239,16 @@ auth.view_users   GET      /auth/users
 
 ### 权限设计
 
-| 权限         | 名称             | 用户组        | 注释                                                       |
-| ---          | ---              | ---           | ---                                                        |
-| 删除用户     | Can delete users | Administrator |                                                            |
-| 查看用户列表 | Can view users   | Administrator | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
+#### 用户组
+
+| 用户组 | 名称          | 注释       |
+| ---    | ---           | ---        |
+| 管理员 | administrator | 系统管理员 |
+
+#### 权限列表
+
+| 权限         | 名称             | 注释                                                       |
+| ---          | ---              | ---                                                        |
+| 删除用户     | Can delete users |                                                            |
+| 查看用户列表 | Can view users   | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
 
