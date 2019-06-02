@@ -3,3 +3,7 @@
 
 # Testing
 pytest==4.5.0
+
+# Code specification
+flake8==3.7.7
+autopep8==1.4.4

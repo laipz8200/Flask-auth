@@ -8,6 +8,7 @@ app = create_app()
 
 @app.shell_context_processor
 def make_shell_context():
+    """Shell import."""
     return {
         'db': db,
         'User': User,

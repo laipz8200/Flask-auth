@@ -1,5 +1,4 @@
 from flask import Flask
-
 from app import auth
 from app.extensions import db, migrate
 
