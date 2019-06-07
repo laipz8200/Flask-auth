@@ -56,7 +56,7 @@ def logout():
 
 @bp.route('/users', methods=['GET'])
 @require_permission(permission='Can view users')
-def view_users(current_user):
+def view_users():
     """View user list.
 
     This method has two hidden parameters:
