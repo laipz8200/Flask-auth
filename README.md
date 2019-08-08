@@ -1,6 +1,6 @@
-# Flask用户验证组件
+# Flask-auth
 
-基于JWT的用户验证和权限管理组件
+A user and permissions manager based on jwt
 
 ```
 .
@@ -23,55 +23,15 @@
 └── requirement.txt
 ```
 
-## 更新
+## Installation
 
-2019-06-07
-
-- 修复了`view_users`方法的Bug.
-
-2019-06-02
-
-- 调整部分变量名
-- 引入flake8和autopep8用于代码规范
-
-2019-06-01
-
-- 为database封装了`order_by`方法
-- 禁止删除处于`administrator`组中的用户
-- 检查权限的装饰器改名为`require_permission`
-- 添加检查登录状态的装饰器`require_login`, 使用时被装饰方法需要在第一个参数接收`current_user`对象
-- 简化之前的方法
-
-2019-05-31
-
-- 添加了`view_users`方法, 修复了权限检查装饰器会替换原函数的bug
-- 登录和注册以外的用户相关URL统一改为'users'
-- 为database封装了`paginate`和`count`方法
-- 为`view_users`方法添加了分页并优化了返回结果
-
-2019-05-30
-
-- 添加了`SurrogateBaseKey`Mixin自动为模型添加主键`id`和删除标志`is_deleted`
-- 修改数据库方法`delete()`为**将`is_deleted`修改为`True`**
-- 添加新方法`remove()`实现原来`delete()`方法的功能
-- 新增了两个类方法`filter_by`和`filter`, 用法与SQLAlchemy原方法类似, 但不会包含被标记为`is_deleted`的结果
-- 添加删除用户接口
-- 编写了权限验证装饰器
-
-2019-05-28
-
-- 添加了基于RBAC模式的权限管理
-- 从github上移除了migrations目录
-
-## 使用
-
-### 安装依赖
+### Install Requirements
 
 ```
 pip install -r requirement.txt
 ```
 
-### 数据库模型和迁移文件初始化
+### Initialize database
 
 ```
 flask db init
@@ -79,9 +39,9 @@ flask db migrate
 flask db upgrade
 ```
 
-### 配置初始化
+### Create Env
 
-在根目录下创建`.env`文件并在其中设置基本信息:
+create a `.env` file with the following settings.
 
 ```
 FLASK_APP=autoapp.py
@@ -89,15 +49,15 @@ DATABASE_URL=<your-database-url>
 SECRET_KEY=<your-secret-key>
 ```
 
-### 运行服务
+### Start Server
 
 ```
 flask run
 ```
 
-## 演示
+## Examples
 
-### 登录
+### Login
 
 ```
 $ http --session=flask-auth POST :5000/auth/login username=admin password=admin
@@ -113,7 +73,7 @@ Set-Cookie: jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyLCJ1dWlkIjo
 }
 ```
 
-#### 认证失败
+#### Login failed
 
 ```
 $ http --session=flask-auth POST :5000/auth/login username=admin password=wrong_psw
@@ -128,7 +88,7 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-#### 缺少信息
+#### Loss information
 
 ```
 $ http --session=flask-auth POST :5000/auth/login
@@ -143,7 +103,7 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-### 获取个人信息
+### Get user info
 
 ```
 $ http --session=flask-auth :5000/auth/users/me
@@ -169,7 +129,7 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-### 查看用户列表
+### view user list
 
 ```
 $ http --session=flask-auth :5000/auth/users
@@ -198,7 +158,7 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-#### 没有认证
+#### Have no verification
 
 ```
 $ http :5000/auth/users
@@ -213,7 +173,7 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-#### 权限不足
+#### Have no permission
 
 ```
 $ http --session=flask-auth :5000/auth/users
@@ -228,9 +188,9 @@ Server: Werkzeug/0.15.4 Python/3.7.3
 }
 ```
 
-## 设计
+## Design
 
-### 路由设计
+### Route
 
 ```
 Endpoint          Methods  Rule
@@ -246,18 +206,18 @@ auth.view_user    GET      /auth/users/<uuid>
 auth.view_users   GET      /auth/users
 ```
 
-### 权限设计
+### Permissions
 
-#### 用户组
+#### Usergroup
 
-| 用户组 | 名称          | 注释       |
-| ---    | ---           | ---        |
-| 管理员 | administrator | 系统管理员 |
+| Group | Name          |
+| ---   | ---           |
+| admin | administrator |
 
-#### 权限列表
+#### Permissions
 
-| 权限         | 名称             | 注释                                                       |
-| ---          | ---              | ---                                                        |
-| 删除用户     | Can delete users |                                                            |
-| 查看用户列表 | Can view users   | 该权限是指列出所有用户的列表, 不是通过uuid访问单个用户信息 |
+| Permission     | text             |
+| ---            | ---              |
+| delete user    | Can delete users |
+| view user list | Can view users   |
 
