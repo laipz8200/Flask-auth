@@ -1,9 +1,10 @@
-# Everything the developer needs in addition to the production requirements
 -r prod.txt
 
-# Testing
-pytest==4.5.0
-
-# Code specification
-flake8==3.7.7
-autopep8==1.4.4
+# dev tools
+alembic==1.0.11
+Mako==1.1.0
+marshmallow==3.0.0
+python-dateutil==2.8.0
+python-dotenv==0.10.3
+python-editor==1.0.4
+six==1.12.0
